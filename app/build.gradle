@@ -22,7 +22,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile = file(System.getenv("HOME") + "keystores/jovmit")
+            storeFile = file(System.getenv("HOME") + "release/jovmit")
             storePassword System.getenv("KEYSTORE_PASSWORD")
             keyAlias System.getenv("FRIENDS_KEY_ALIAS")
             keyPassword System.getenv("FRIENDS_KEY_PASSWORD")

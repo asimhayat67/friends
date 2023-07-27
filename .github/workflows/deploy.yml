@@ -14,7 +14,7 @@ jobs:
         with:
           java-version: 17
       - name: Assemble Release Bundle
-        run: |
+        run: |   
           ./gradlew bundleRelease
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
@@ -34,7 +34,7 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.cicd.friends
           releaseFiles: app/build/output/bundle/release/app-release.aab
-          track: alpha
+          track: internal
           whatsNewDirectory: whatsNewDirectory/
 
 

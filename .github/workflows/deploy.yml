@@ -4,18 +4,6 @@ on:
   push:
     branches: [development]
 
-env:
-  CI: true  # This environment variable ensures actions will run in CI mode
-
-# Set the global Node.js version to 16
-defaults:
-  run:
-    shell: bash
-    'shell.args': ['--login', '-eo', 'pipefail', '-c']
-
-  env:
-    NODE_VERSION: 16
-
 jobs:
   test:
     name: Unit tests

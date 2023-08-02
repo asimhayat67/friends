@@ -4,6 +4,18 @@ on:
   push:
     branches: [development]
 
+env:
+  CI: true  # This environment variable ensures actions will run in CI mode
+
+# Set the global Node.js version to 16
+defaults:
+  run:
+    shell: bash
+    'shell.args': ['--login', '-eo', 'pipefail', '-c']
+
+  env:
+    NODE_VERSION: 16
+
 jobs:
   test:
     name: Unit tests
@@ -95,6 +107,12 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
+
+      # Add the "distribution" input here with a default value if needed
+      - name: Some Action Requiring Distribution
+        uses: some-org/some-action@v1
+        with:
+          distribution: ${{ github.event.inputs.distribution || 'default-value' }}  # Use 'default-value' or your desired default
 
       - name: Version bump
         uses: chkfung/android-version-actions@v1.1

@@ -83,51 +83,51 @@ jobs:
       - name: Run instrumentation tests in Firebase Test Lab
         run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=flame,version=30
 
-  distribute:
-    name: Distribute app bundle to Play Store
-    needs: firebase
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+distribute:
+ name: Distribute app bundle to Play Store
+ needs: firebase
+ runs-on: ubuntu-latest
+ steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
 
-      - name: Setup JDK 17
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
+   - name: Setup JDK 17
+     uses: actions/setup-java@v2
+     with:
+       java-version: '17'
 
-      # Add the "distribution" input here with a default value if needed
-      - name: Distribute with Specific Distribution
-        run: echo "The distribution input is:${{ github.event.inputs.distribution }}"
-        env:
-          DISTRIBUTION: ${{ github.event.inputs.distribution || 'default-value' }}  # Use 'default-value' or your desired default
+   # Add the "distribution" input here with a default value if needed
+   - name: Some Action Requiring Distribution
+     uses: some-org/some-action@v1
+     with:
+       distribution: ${{ github.event.inputs.distribution || 'default-value' }}  # Use 'default-value' or your desired default
 
-      - name: Version bump
-        uses: chkfung/android-version-actions@v1.1
-        with:
-          gradlePath: app/build.gradle
-          versionCode: ${{ github.run_number }}
+   - name: Version bump
+     uses: chkfung/android-version-actions@v1.1
+     with:
+       gradlePath: app/build.gradle
+       versionCode: ${{ github.run_number }}
 
-      - name: Assemble Release Bundle
-        run: ./gradlew bundleRelease
+   - name: Assemble Release Bundle
+     run: ./gradlew bundleRelease
 
-      - name: Sign Release
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
-          alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
-          keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
+   - name: Sign Release
+     uses: r0adkll/sign-android-release@v1
+     with:
+       releaseDirectory: app/build/outputs/bundle/release
+       signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+       alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
+       keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
+       keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
-      - name: Setup authorization with Google Play Store
-        run: echo '${{ secrets.GOOGLE_SERVICES_API }}' > service_account.json
+   - name: Setup authorization with Google Play Store
+     run: echo '${{ secrets.GOOGLE_SERVICES_API }}' > service_account.json
 
-      - name: Deploy to Internal
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJson: service_account.json
-          packageName: com.cicd.friends
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: ${{ env.DISTRIBUTION }}  # Use the distribution value here
-          whatsNewDirectory: whatsNewDirectory/
+   - name: Deploy to Internal
+     uses: r0adkll/upload-google-play@v1
+     with:
+       serviceAccountJson: service_account.json
+       packageName: com.cicd.friends
+       releaseFiles: app/build/outputs/bundle/release/app-release.aab
+       track: internal
+       whatsNewDirectory: whatsNewDirectory/

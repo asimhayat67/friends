@@ -97,10 +97,10 @@ jobs:
           java-version: '17'
 
       # Add the "distribution" input here with a default value if needed
-      - name: Some Action Requiring Distribution
-        uses: some-org/some-action@v1
-        with:
-          distribution: ${{ github.event.inputs.distribution || 'default-value' }}  # Use 'default-value' or your desired default
+      - name: Distribute with Specific Distribution
+        run: echo "The distribution input is:${{ github.event.inputs.distribution }}"
+        env:
+          DISTRIBUTION: ${{ github.event.inputs.distribution || 'default-value' }}  # Use 'default-value' or your desired default
 
       - name: Version bump
         uses: chkfung/android-version-actions@v1.1
@@ -129,5 +129,5 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: ${{ env.DISTRIBUTION }}  # Use the distribution value here
           whatsNewDirectory: whatsNewDirectory/

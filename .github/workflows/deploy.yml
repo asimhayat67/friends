@@ -37,6 +37,9 @@ jobs:
         with:
           java-version: 17
 
+      - name: Grand execute permissions to gradlew
+        run: chmod +x ./gradlew
+
       - name: Assemble app debug APK
         run: ./gradlew assembleDebug
 

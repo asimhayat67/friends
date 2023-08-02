@@ -83,6 +83,8 @@ jobs:
           project_id: ${{ secrets.FRIENDS_PROJECT_ID }}
           service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
           export_default_credentials: true
+      - name: Authenticate with gcloud
+        run: gcloud auth login
 
       - name: Run instrumentation tests in Firebase Test Lab
         run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=Pixel3,version=28

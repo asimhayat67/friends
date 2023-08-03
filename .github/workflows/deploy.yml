@@ -136,8 +136,8 @@ jobs:
       - name: Deploy to alpha
         uses: r0adkll/upload-google-play@v1.0.0
         with:
-          serviceAccountJson: service_account.json
+          serviceAccountJson: secrets.GCLOUD_SERVICE_KEY
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: alpha
+          track: internal
           whatsNewDirectory: whatsNewDirectory/

@@ -124,6 +124,7 @@ jobs:
           keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
+
       - name: Setup authorization with Google Play Store
         run: echo '${{secrets.GOOGLE_SERVICES_API }}' > service_account.json
 

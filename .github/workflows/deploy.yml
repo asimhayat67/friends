@@ -88,7 +88,7 @@ jobs:
      #   run: echo "${{ secrets.FIREBASE_AUTH }}" > "$HOME"/firebase-key.json
 
       - name: Authenticate with gcloud
-        run: echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | gcloud auth activate-service-account --key-file=-
+        run: gcloud auth login
 
         # - name: Authenticate with Google Cloud
        # run: gcloud auth activate-service-account --key-file=<(echo ${{ secrets.FRIENDS_PROJECT_ID }})

@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [development]
+    branches: [ development ]
 
 jobs:
   test:
@@ -77,12 +77,16 @@ jobs:
         with:
           name: app-debug-androidTest
 
-    #  - name: Install Google Cloud SDK
-     #   run: |
-      #    curl https://sdk.cloud.google.com | bash
-       #   exec -l $SHELL
+        #  - name: Install Google Cloud SDK
+        #   run: |
+        #    curl https://sdk.cloud.google.com | bash
+        #   exec -l $SHELL
         #  gcloud init
-
+      - name: Download and Install gcloud
+        run: |
+          wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-356.0.0-linux-x86_64.tar.gz -O gcloud-sdk.tar.gz
+          tar -xzf gcloud-sdk.tar.gz
+          ./google-cloud-sdk/install.sh --quiet
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@main
@@ -91,8 +95,10 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
           export_default_credentials: true
 
-      - name: Authenticate with gcloud
-        run: gcloud auth application-default login --no-browser
+      - name: Authenticate with Google Cloud
+        run: gcloud auth activate-service-account --key-file=<(echo "$GCLOUD_SERVICE_KEY")
+      #   - name: Authenticate with gcloud
+      #    run: gcloud auth application-default login --no-browser
 
       - name: Run instrumentation tests in Firebase Test Lab
         run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=Pixel3,version=28

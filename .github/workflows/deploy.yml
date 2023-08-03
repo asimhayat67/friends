@@ -87,8 +87,15 @@ jobs:
     #  - name: Set up Firebase environment variable
      #   run: echo "${{ secrets.FIREBASE_AUTH }}" > "$HOME"/firebase-key.json
 
-      - name: Authenticate with gcloud
-        run: gcloud auth login
+      #- name: Authenticate with gcloud
+        #run: gcloud auth login
+      - name: 'Decrypt github-packages properties'
+        run: gcloud kms decrypt
+                 --ciphertext-file=encrypted-file_path
+                 --plaintext-file=file_path
+                 --location=europe-west1
+                 --keyring=ci-keyring
+                 --key=${{secrets.GCLOUD_SERVICE_KEY}}
 
         # - name: Authenticate with Google Cloud
        # run: gcloud auth activate-service-account --key-file=<(echo ${{ secrets.FRIENDS_PROJECT_ID }})

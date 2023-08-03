@@ -98,7 +98,7 @@ jobs:
      # - name: Authenticate with Google Cloud
        # run: gcloud auth activate-service-account --key-file=<(echo secrets.FIREBASE_AUTH)
       - name: Authenticate with gcloud
-        run: gcloud auth login
+        run: gcloud auth login --no-browser
 
       - name: Run instrumentation tests in Firebase Test Lab
         run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=Pixel3,version=28

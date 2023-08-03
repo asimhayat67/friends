@@ -77,6 +77,13 @@ jobs:
         with:
           name: app-debug-androidTest
 
+      - name: Install Google Cloud SDK
+        run: |
+          curl https://sdk.cloud.google.com | bash
+          exec -l $SHELL
+          gcloud init
+
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@main
         with:

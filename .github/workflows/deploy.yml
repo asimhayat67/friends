@@ -64,8 +64,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Download app APK
         uses: actions/download-artifact@v1
@@ -77,25 +76,20 @@ jobs:
         with:
           name: app-debug-androidTest
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@main
+      - id: Auth
+        uses: google-github-actions/auth@v0
         with:
           project_id: ${{ secrets.FRIENDS_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
-    #  - name: Set up Firebase environment variable
-     #   run: echo "${{ secrets.FIREBASE_AUTH }}" > "$HOME"/firebase-key.json
+      - name: Authenticate with gcloud
+        run: echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | gcloud auth activate-service-account --key-file=-
 
-      #- name: Authenticate with gcloud
-        #run: gcloud auth login
-      - name: 'Decrypt github-packages properties'
-        run: gcloud kms decrypt
-                 --ciphertext-file=encrypted-file_path
-                 --plaintext-file=file_path
-                 --location=europe-west1
-                 --keyring=ci-keyring
-                 --key=${{secrets.GCLOUD_SERVICE_KEY}}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Use gcloud CLI
+        run: gcloud info
 
         # - name: Authenticate with Google Cloud
        # run: gcloud auth activate-service-account --key-file=<(echo ${{ secrets.FRIENDS_PROJECT_ID }})

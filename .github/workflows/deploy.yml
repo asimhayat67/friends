@@ -82,11 +82,11 @@ jobs:
         #    curl https://sdk.cloud.google.com | bash
         #   exec -l $SHELL
         #  gcloud init
-      - name: Download and Install gcloud
-        run: |
-          wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-356.0.0-linux-x86_64.tar.gz -O gcloud-sdk.tar.gz
-          tar -xzf gcloud-sdk.tar.gz
-          ./google-cloud-sdk/install.sh --quiet
+     # - name: Download and Install gcloud
+       # run: |
+       #   wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-356.0.0-linux-x86_64.tar.gz -O gcloud-sdk.tar.gz
+        #  tar -xzf gcloud-sdk.tar.gz
+        #  ./google-cloud-sdk/install.sh --quiet
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@main

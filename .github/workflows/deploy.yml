@@ -86,9 +86,6 @@ jobs:
       - name: Authenticate with gcloud
         run: gcloud auth login
 
-      - name: set account with gcloud
-        run: gcloud config set account asimhayat67@gmail.com
-
       - name: Run instrumentation tests in Firebase Test Lab
         run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=Pixel3,version=28
 

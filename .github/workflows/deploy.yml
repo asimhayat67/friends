@@ -39,6 +39,7 @@ jobs:
           distribution: 'temurin'
           java-version: 11
           cache: 'gradle'
+
       - name: Grand execute permissions to gradlew
         run: chmod +x gradlew
 

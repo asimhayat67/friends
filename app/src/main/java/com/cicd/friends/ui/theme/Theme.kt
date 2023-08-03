@@ -1,4 +1,4 @@
-package com.example.friends.ui.theme
+package com.cicd.friends.ui.theme
 
 import android.app.Activity
 import android.os.Build

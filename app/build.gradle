@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.friends'
+    namespace 'com.cicd.friends'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.friends"
+        applicationId "com.cicd.friends"
         minSdk 24
         targetSdk 33
         versionCode 1

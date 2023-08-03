@@ -1,4 +1,4 @@
-package com.example.friends
+package com.cicd.friends
 
 import org.junit.Test
 

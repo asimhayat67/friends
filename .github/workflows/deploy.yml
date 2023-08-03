@@ -92,13 +92,13 @@ jobs:
         uses: google-github-actions/setup-gcloud@main
         with:
           project_id: ${{ secrets.FRIENDS_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
+          service_account_key: ${{ secrets.FIREBASE_AUTH }}
           export_default_credentials: true
 
-      - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=<(echo secrets.GCLOUD_SERVICE_KEY)
-      #   - name: Authenticate with gcloud
-      #    run: gcloud auth application-default login --no-browser
+     # - name: Authenticate with Google Cloud
+       # run: gcloud auth activate-service-account --key-file=<(echo secrets.FIREBASE_AUTH)
+      - name: Authenticate with gcloud
+        run: gcloud auth login
 
       - name: Run instrumentation tests in Firebase Test Lab
         run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=Pixel3,version=28

@@ -87,13 +87,16 @@ jobs:
     #  - name: Set up Firebase environment variable
      #   run: echo "${{ secrets.FIREBASE_AUTH }}" > "$HOME"/firebase-key.json
 
+      - name: Write service account key to file
+        run: echo "${{ secrets.FIREBASE_AUTH }}" > "$HOME"/service-account-key.json
+
       - name: Authenticate with gcloud
-        run: gcloud auth activate-service-account --key-file <(echo "${{ secrets.GCLOUD_SERVICE_KEY }}")
+        run: echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | gcloud auth activate-service-account --key-file=-
 
 
 
 
-     # - name: Authenticate with Google Cloud
+        # - name: Authenticate with Google Cloud
        # run: gcloud auth activate-service-account --key-file=<(echo ${{ secrets.FRIENDS_PROJECT_ID }})
   #    - name: Authenticate with gcloud
     #   run: gcloud auth login

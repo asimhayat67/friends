@@ -131,12 +131,12 @@ jobs:
 
 
       - name: Setup authorization with Google Play Store
-        run: echo '${{secrets.GOOGLE_SERVICES_API }}' > service_account.json
+        run: echo '${{secrets.GOOGLE_SERVICES_API }}' > ${{ secrets.GCLOUD_SERVICE_KEY}}
 
       - name: Deploy to alpha
         uses: r0adkll/upload-google-play@v1.0.0
         with:
-          serviceAccountJson: secrets.GCLOUD_SERVICE_KEY
+          serviceAccountJson: ${{ secrets.GCLOUD_SERVICE_KEY}}
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal

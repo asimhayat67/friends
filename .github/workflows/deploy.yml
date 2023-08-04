@@ -123,7 +123,7 @@ jobs:
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/build/outputs/bundle/release
+          releaseDirectory: app/release
           signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
           alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}

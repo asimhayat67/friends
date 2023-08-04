@@ -138,6 +138,6 @@ jobs:
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_SERVICES_API}}
           packageName: com.cicd.friends
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          releaseFile: app/build/outputs/bundle/release/app-release.aab
           track: internal
           whatsNewDirectory: whatsNewDirectory/

@@ -137,7 +137,7 @@ jobs:
         run: echo "SERVICE_ACCOUNT_JSON=${{ secrets.GOOGLE_SERVICES_API}}" >> $GITHUB_ENV
 
       - name: Deploy to internal
-        uses: r0adkll/upload-google-play@v1.0.1
+        uses: r0adkll/upload-google-play@v1.0.0
         with:
           serviceAccountJson: ${{ secrets.GOOGLE_SERVICES_API}}
           packageName: com.cicd.friends

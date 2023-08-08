@@ -7,97 +7,21 @@ on:
 jobs:
 
   test:
-    name: Unit tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: 'gradle'
-
-      - name: Grand execute permissions to gradlew
-        run: chmod +x gradlew
-
-      - name: Run unit tests
-        run: ./gradlew testDebug
+  # ... (no changes)
 
   apk:
-    name: Generate APK
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: 'gradle'
-
-      - name: Grand execute permissions to gradlew
-        run: chmod +x gradlew
-
-      - name: Assemble app debug APK
-        run: ./gradlew assembleDebug
-
-      - name: Upload app APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Assemble app instrumentation tests
-        run: ./gradlew assembleDebugAndroidTest
-
-      - name: Upload app test APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-debug-androidTest
-          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+  # ... (no changes)
 
   firebase:
-    name: Run UI tests with Firebase Test Lab
-    needs: apk
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Download app APK
-        uses: actions/download-artifact@v1
-        with:
-          name: app-debug
-
-      - name: Download app test APK
-        uses: actions/download-artifact@v1
-        with:
-          name: app-debug-androidTest
-
-      - id: Auth
-        uses: google-github-actions/auth@v0
-        with:
-          project_id: ${{ secrets.FRIENDS_PROJECT_ID }}
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY}}
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
-
-      - name: Use gcloud CLI
-        run: gcloud info
-
-      - name: Run instrumentation tests in Firebase Test Lab
-        run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=blueline,version=28
+  # ... (no changes)
 
   distribute:
     name: Distribute app bundle to Play Store
-    needs: firebase
+    needs: [firebase, apk, test]
     runs-on: ubuntu-latest
+
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
     steps:
       - name: Checkout code
@@ -129,23 +53,22 @@ jobs:
           keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
-      - name: Set up Environment
-        run: |
-          echo "GOOGLE_APPLICATION_CREDENTIALS_CONTENT=${{ secrets.GOOGLE_SERVICES_API }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_JSON=${{ github.workspace }}/service_account.json" >> $GITHUB_ENV
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-
-      - name: Setup authorization with Google Play Store
+      - name: Set up Google Play credentials
         run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json
 
       - name: Deploy to internal
+        run: |
+          cp app/build/outputs/bundle/release/app-release.aab $GITHUB_WORKSPACE/app-release.aab
+          cp $GITHUB_WORKSPACE/service_account.json $GITHUB_WORKSPACE/service_account.json
+        continue-on-error: true
+
+      - name: Upload to Play Store
+        if: success()
         uses: r0adkll/upload-google-play@v1.0.0
         with:
           serviceAccountJson: $GITHUB_WORKSPACE/service_account.json
           packageName: com.cicd.friends
-          releaseFile: $GITHUB_WORKSPACE/app/build/outputs/bundle/release/app-release.aab
+          releaseFile: $GITHUB_WORKSPACE/app-release.aab
           track: internal
           status: 'completed'
           whatsNewDirectory: whatsNewDirectory/

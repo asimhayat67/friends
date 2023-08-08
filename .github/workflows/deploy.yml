@@ -132,22 +132,17 @@ jobs:
           keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
-      - name: Set up Google Play credentials
-        run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json
+     # - name: Set up Google Play credentials
+      #  run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json
 
-      - name: Deploy to internal
-        run: |
-          cp app/build/outputs/bundle/release/app-release.aab $GITHUB_WORKSPACE/app-release.aab
-          cp $GITHUB_WORKSPACE/service_account.json $GITHUB_WORKSPACE/service_account.json
-        continue-on-error: true
+      - name: Setup auth with Google play store
+        run: echo '${{ secrets.GOOGLE_SERVICE_API }}' > service_account.json
 
-      - name: Upload to Play Store
-        if: success()
-        uses: r0adkll/upload-google-play@v1.0.0
+      - name: Deploy to Internal
+        uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: ${{ secrets.GOOGLE_SERVICES_API }}
-          packageName: com.cicd.friends
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          serviceAccountJson: service_account.json
+          packageName: com.friendsDomain.friendsapp
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal
-          status: 'completed'
-          whatsNewDirectory: whatsNewDirectory
+          whatsNewDirectory: whatsNewDirectory/

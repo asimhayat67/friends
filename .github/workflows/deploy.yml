@@ -136,17 +136,17 @@ jobs:
       #  run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json
 
       - name: Setup auth with Google play store
-        run: echo '${{ secrets.GCLOUD_SERVICE_KEY }}' > service_account.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_API }}' > service_account.json
 
       - name: Deploy to Internal
         uses: r0adkll/upload-google-play@v1
         with:
           #serviceAccountJson: service_account.json
-          serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_KEY }}
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICES_API }}
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: alpha
           status: inProgress
           mappingFile: app/build/outputs/mapping/release/mapping.txt
-          userFraction: 0.3
+          userFraction: 0.33
           whatsNewDirectory: whatsNewDirectory/

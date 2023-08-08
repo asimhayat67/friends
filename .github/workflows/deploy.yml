@@ -129,6 +129,13 @@ jobs:
           keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
+      - name: Set up Environment
+        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS_CONTENT=${{ secrets.GOOGLE_SERVICES_API }}" >> $GITHUB_ENV
+          echo "SERVICE_ACCOUNT_JSON=${{ github.workspace }}/service_account.json" >> $GITHUB_ENV
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
 
       - name: Setup authorization with Google Play Store
         run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json

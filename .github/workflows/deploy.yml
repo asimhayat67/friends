@@ -148,5 +148,5 @@ jobs:
           track: alpha
           status: inProgress
           mappingFile: app/build/outputs/mapping/release/mapping.txt
-          userFraction: 1
+          userFraction: 0.3
           whatsNewDirectory: whatsNewDirectory/

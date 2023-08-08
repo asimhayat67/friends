@@ -145,7 +145,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_KEY }}
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: alpha
           status: inProgress
           mappingFile: app/build/outputs/mapping/release/mapping.txt
           userFraction: 0.33

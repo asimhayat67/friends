@@ -141,8 +141,10 @@ jobs:
       - name: Deploy to Internal
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: service_account.json
+          #serviceAccountJson: service_account.json
+          serviceAccountJsonPlainText: ${{ secrets.GCLOUD_SERVICE_KEY }}
           packageName: com.cicd.friends
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: alpha
+          status: inProgress
           whatsNewDirectory: whatsNewDirectory/

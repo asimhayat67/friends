@@ -146,5 +146,5 @@ jobs:
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: alpha
-          status: inProgress
+          status: draft
           whatsNewDirectory: whatsNewDirectory/

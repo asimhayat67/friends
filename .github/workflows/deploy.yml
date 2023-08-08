@@ -144,5 +144,5 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: alpha
           whatsNewDirectory: whatsNewDirectory/

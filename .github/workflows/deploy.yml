@@ -145,7 +145,7 @@ jobs:
         if: success()
         uses: r0adkll/upload-google-play@v1.0.0
         with:
-          serviceAccountJson: $GITHUB_WORKSPACE/service_account.json
+          serviceAccountJson: secrets.GOOGLE_SERVICES_API
           packageName: com.cicd.friends
           releaseFile: $GITHUB_WORKSPACE/app-release.aab
           track: internal

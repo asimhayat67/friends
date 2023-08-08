@@ -83,7 +83,7 @@ jobs:
         uses: google-github-actions/auth@v0
         with:
           project_id: ${{ secrets.FRIENDS_PROJECT_ID }}
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY}}
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
@@ -142,11 +142,11 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           #serviceAccountJson: service_account.json
-          serviceAccountJson: service_account.json
+          serviceAccountJson: ${{ secrets.GCLOUD_SERVICE_KEY }}
           packageName: com.cicd.friends
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: alpha
-          status: inProgress
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
-          userFraction: 0.44
+         # status: inProgress
+        #  mappingFile: app/build/outputs/mapping/release/mapping.txt
+        #  userFraction: 0.44
           whatsNewDirectory: whatsNewDirectory/

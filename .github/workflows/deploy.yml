@@ -139,7 +139,7 @@ jobs:
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
 
       - name: Deploy to Internal
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.0.1
         with:
           #serviceAccountJson: service_account.json
           serviceAccountJson: service_account.json

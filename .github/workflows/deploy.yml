@@ -149,5 +149,5 @@ jobs:
           status: 'completed'
           whatsNewDirectory: whatsNewDirectory/
          # status: inProgress
-        #  mappingFile: app/build/outputs/mapping/release/mapping.txt
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
         #  userFraction: 0.44

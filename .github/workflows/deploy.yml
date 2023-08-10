@@ -123,31 +123,93 @@ jobs:
       - name: Assemble Release Bundle
         run: ./gradlew bundleRelease
 
-      - name: Sign Release
+
+
+
+
+
+      # Building and signing App
+      - name: Build Android App Bundle
+        run: cd android && ./gradlew bundleRelease
+
+      - name: Sign ABB
         uses: r0adkll/sign-android-release@v1
+        # ID used to access action output
+        id: sign_app
         with:
-          releaseDirectory: app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+          releaseDirectory: app/build/outputs/bundle/re
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTOR
           alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
+          keyStorePassword: ${{ secrets.FRIENDS_KEY_PAS
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
-     # - name: Set up Google Play credentials
-      #  run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json
-
-      - name: Setup auth with Google play store
-        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
-
-      - name: Deploy to Internal
-        uses: r0adkll/upload-google-play@v1
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
-          #serviceAccountJson: service_account.json
-          serviceAccountJson: service_account.json
+          name: Signed app bundle
+          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          retention-days: 4
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release V${{ github.run_number }}
+          draft: true
+          prerelease: true
+
+      - name: Upload Release AAB
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          asset_name: app-release-v${{ github.run_number }}.zip
+          asset_content_type: application/zip
+
+        # Distribute  App to google play
+      - name: Publish to Play Store internal test track
+        uses: r0adkll/upload-google-play@v1.0.2
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.cicd.friends
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
+          inAppUpdatePriority: 3
+
+
+
+
+
+
+   #   - name: Sign Release
+   #     uses: r0adkll/sign-android-release@v1
+    #    with:
+     #     releaseDirectory: app/build/outputs/bundle/release
+      #    signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+       #   alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
+        #  keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
+         # keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
+
+#      - name: Setup auth with Google play store
+ #       run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+  #    - name: Deploy to Internal
+   #     uses: r0adkll/upload-google-play@v1
+    #    with:
+
+     #     serviceAccountJson: service_account.json
+      #    packageName: com.cicd.friends
+       #   releaseFile: app/build/outputs/bundle/release/app-release.aab
+        #  track: internal
+         # inAppUpdatePriority: 3
         #  userFraction: 0.44
-          whatsNewDirectory: whatsNewDirectory/
+         # whatsNewDirectory: whatsNewDirectory/
          # status: inProgress
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
+         # mappingFile: app/build/outputs/mapping/release/mapping.txt
         #  userFraction: 0.44

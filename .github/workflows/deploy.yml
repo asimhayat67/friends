@@ -137,10 +137,10 @@ jobs:
         # ID used to access action output
         id: sign_app
         with:
-          releaseDirectory: app/build/outputs/bundle/re
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTOR
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
           alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.FRIENDS_KEY_PAS
+          keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
       - name: Upload Artifact

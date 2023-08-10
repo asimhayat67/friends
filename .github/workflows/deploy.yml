@@ -5,57 +5,126 @@ on:
     branches: [ main ]
 
 jobs:
-  android-build:
-    # The type of runner that the job will run on
+
+  test:
+    name: Unit tests
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
+
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
 
-      # Automatically overrides the version code and version name through the github actions
-      - name: Bump version
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Grand execute permissions to gradlew
+        run: chmod +x gradlew
+
+      - name: Run unit tests
+        run: ./gradlew testDebug
+
+  apk:
+    name: Generate APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Grand execute permissions to gradlew
+        run: chmod +x gradlew
+
+      - name: Assemble app debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload app APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Assemble app instrumentation tests
+        run: ./gradlew assembleDebugAndroidTest
+
+      - name: Upload app test APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug-androidTest
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+
+  firebase:
+    name: Run UI tests with Firebase Test Lab
+    needs: apk
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download app APK
+        uses: actions/download-artifact@v1
+        with:
+          name: app-debug
+
+      - name: Download app test APK
+        uses: actions/download-artifact@v1
+        with:
+          name: app-debug-androidTest
+
+      - id: Auth
+        uses: google-github-actions/auth@v0
+        with:
+          project_id: ${{ secrets.FRIENDS_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Use gcloud CLI
+        run: gcloud info
+
+      - name: Run instrumentation tests in Firebase Test Lab
+        run: gcloud firebase test android run --type instrumentation --app app-debug/app-debug.apk --test app-debug-androidTest/app-debug-androidTest.apk --device model=blueline,version=28
+
+  distribute:
+    name: Distribute app bundle to Play Store
+    needs: [ firebase, apk, test ]
+    runs-on: ubuntu-latest
+
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Version bump
         uses: chkfung/android-version-actions@v1.1
         with:
-          gradlePath: android/app/build.gradle
-          versionCode: ${{github.run_number}}
+          gradlePath: app/build.gradle
+          versionCode: ${{ github.run_number }}
 
-      - name: Install Dependencies
-        run: yarn install
+      - name: Grand execute permissions to gradlew
+        run: chmod +x gradlew
 
-      - name: Run Unit Test
-        run: ./gradlew test
-
-      ## cache Gradle dependencies and wrapper to reduce build time
-      - name: Cache Gradle Wrapper
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-
-      - name: Cache Gradle Dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-caches-
-      - name: Make Gradlew Executable
-        run: cd android && chmod +x ./gradlew
-
-
-
-
-
-
-      # Building and signing App
-      - name: Build Android App Bundle
+      - name: Assemble Release Bundle
         run: ./gradlew bundleRelease
 
-      - name: Sign ABB
+      - name: Sign Release
         uses: r0adkll/sign-android-release@v1
-        # ID used to access action output
-        id: sign_app
         with:
           releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
@@ -63,71 +132,21 @@ jobs:
           keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Signed app bundle
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
-          retention-days: 4
+     # - name: Set up Google Play credentials
+      #  run: echo "${{ secrets.GOOGLE_SERVICES_API }}" > $GITHUB_WORKSPACE/service_account.json
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release V${{ github.run_number }}
-          draft: true
-          prerelease: true
+      - name: Setup auth with Google play store
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
 
-      - name: Upload Release AAB
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
-          asset_name: app-release-v${{ github.run_number }}.zip
-          asset_content_type: application/zip
-
-        # Distribute  App to google play
-      - name: Publish to Play Store internal test track
+      - name: Deploy to Internal
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          #serviceAccountJson: service_account.json
+          serviceAccountJson: service_account.json
           packageName: com.cicd.friends
           releaseFile: app/build/outputs/bundle/release/app-release.aab
           track: internal
-          whatsNewDirectory: whatsNewDirectory/
-
-
-
-
-
-   #   - name: Sign Release
-   #     uses: r0adkll/sign-android-release@v1
-    #    with:
-     #     releaseDirectory: app/build/outputs/bundle/release
-      #    signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
-       #   alias: ${{ secrets.FRIENDS_KEY_ALIAS }}
-        #  keyStorePassword: ${{ secrets.FRIENDS_KEY_PASSWORD }}
-         # keyPassword: ${{ secrets.KEYSTORE_PASSWORD }}
-
-#      - name: Setup auth with Google play store
- #       run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
-
-  #    - name: Deploy to Internal
-   #     uses: r0adkll/upload-google-play@v1
-    #    with:
-
-     #     serviceAccountJson: service_account.json
-      #    packageName: com.cicd.friends
-       #   releaseFile: app/build/outputs/bundle/release/app-release.aab
-        #  track: internal
-         # inAppUpdatePriority: 3
-        #  userFraction: 0.44
+         #  userFraction: 0.44
          # whatsNewDirectory: whatsNewDirectory/
          # status: inProgress
          # mappingFile: app/build/outputs/mapping/release/mapping.txt

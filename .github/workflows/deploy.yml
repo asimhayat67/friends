@@ -130,7 +130,7 @@ jobs:
 
       # Building and signing App
       - name: Build Android App Bundle
-        run: cd android && ./gradlew bundleRelease
+        run: ./gradlew bundleRelease
 
       - name: Sign ABB
         uses: r0adkll/sign-android-release@v1
